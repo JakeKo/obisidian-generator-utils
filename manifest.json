@@ -1,11 +1,11 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
+	"id": "generator-utils",
+	"name": "Generator Utils",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "This is a sample plugin for Obsidian. This plugin demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
-	"isDesktopOnly": false
+	"description": "This is a plugin designed to generate different groups of related notes.",
+	"author": "Jake Koperski",
+	"authorUrl": "",
+	"fundingUrl": "",
+	"isDesktopOnly": true
 }
