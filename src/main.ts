@@ -1,4 +1,4 @@
-import { AnnotationModal, TopicModal } from "modals";
+import { AnnotationModal, TopicModal } from "src/modals";
 import { Plugin } from "obsidian";
 
 export default class GeneratorUtils extends Plugin {

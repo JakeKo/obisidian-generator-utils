@@ -6,7 +6,7 @@ import {
 	CANVAS_CONTENT,
 	PAPER_TITLE,
 	PAPER_CONTENT,
-} from "templates";
+} from "src/templates";
 
 type TopicProps = {
 	topic_title: string;
