@@ -1,4 +1,4 @@
-import { App, Modal, Setting } from "obsidian";
+import { App, DataAdapter, Modal, Setting } from "obsidian";
 import {
 	ANNOTATION_CONTENT,
 	ANNOTATION_TITLE,
@@ -19,6 +19,23 @@ type AnnotationProps = {
 	tag_class: string;
 };
 
+function createFilesAndFolders(
+	adapter: DataAdapter,
+	pathObject: Record<string, any>,
+	basePath = ""
+) {
+	Object.entries(pathObject).forEach(([path, content]) => {
+		const subPath = basePath + "/" + path;
+
+		if (typeof content === "object") {
+			adapter.mkdir(subPath);
+			createFilesAndFolders(adapter, content, subPath);
+		} else {
+			adapter.write(subPath, content);
+		}
+	});
+}
+
 function hydrateTemplateString(template: string, props: Record<string, any>) {
 	const entries = Object.entries(props);
 	let hydratedTemplate = template;
@@ -31,33 +48,32 @@ function hydrateTemplateString(template: string, props: Record<string, any>) {
 	return hydratedTemplate;
 }
 
-function generateTopicFolder(props: TopicProps, path = "") {
-	const topicPath = path + props.topic_title;
-	this.app.vault.adapter.mkdir(topicPath);
-}
-
-function generateAnnotations(props: AnnotationProps, path = "") {
+function annotationData(props: AnnotationProps) {
 	const noteTitle = hydrateTemplateString(ANNOTATION_TITLE, props);
 	const noteContent = hydrateTemplateString(ANNOTATION_CONTENT, props);
-	const notePath = path + noteTitle;
-
-	this.app.vault.adapter.write(notePath, noteContent);
+	return { [noteTitle]: noteContent };
 }
 
-function generateCanvas(props: TopicProps, path = "") {
+function annotationsData(props: AnnotationProps[]) {
+	return props.reduce(
+		(annotations, p) => ({
+			...annotations,
+			...annotationData(p),
+		}),
+		{}
+	);
+}
+
+function canvasData(props: TopicProps) {
 	const canvasTitle = hydrateTemplateString(CANVAS_TITLE, props);
 	const canvasContent = hydrateTemplateString(CANVAS_CONTENT, props);
-	const canvasPath = path + canvasTitle;
-
-	this.app.vault.adapter.write(canvasPath, canvasContent);
+	return { [canvasTitle]: canvasContent };
 }
 
-function generateReactionPaper(props: TopicProps, path = "") {
+function reactionPaperData(props: TopicProps) {
 	const paperTitle = hydrateTemplateString(PAPER_TITLE, props);
 	const paperContent = hydrateTemplateString(PAPER_CONTENT, props);
-	const paperPath = path + paperTitle;
-
-	this.app.vault.adapter.write(paperPath, paperContent);
+	return { [paperTitle]: paperContent };
 }
 
 class TopicModal extends Modal {
@@ -90,6 +106,15 @@ class TopicModal extends Modal {
 		return classFolderObject;
 	}
 
+	async getAnnotationArticles(): Promise<Record<string, string>> {
+		const { files } = await this.app.vault.adapter.list("/pdf");
+		const articlesObject = Object.fromEntries(
+			files.map((f) => f.replace("pdf/", "")).map((f) => [f, f])
+		);
+
+		return articlesObject;
+	}
+
 	async onOpen() {
 		const { contentEl } = this;
 
@@ -109,6 +134,16 @@ class TopicModal extends Modal {
 			});
 		});
 
+		const articles = await this.getAnnotationArticles();
+		new Setting(contentEl).setName("Articles").addDropdown((dropdown) => {
+			dropdown.selectEl.multiple = true;
+			dropdown.addOptions(articles);
+
+			dropdown.onChange((value) => {
+				this.annotationsPaths = [value];
+			});
+		});
+
 		new Setting(contentEl).addButton((btn) =>
 			btn
 				.setButtonText("Submit")
@@ -121,17 +156,34 @@ class TopicModal extends Modal {
 	}
 
 	onSubmit() {
-		const props: TopicProps = {
+		const topicProps: TopicProps = {
 			topic_title: this.topicTitle,
 			tag_class: this.tagClass,
 		};
+		const annotationProps: AnnotationProps[] = this.annotationsPaths.map(
+			(path) => {
+				const year = Number.parseInt(path.match(/[0-9]+/)![0]);
 
-		const topicFolderPath = this.classFolder + "/" + this.topicTitle + "/";
-		generateTopicFolder(props, this.classFolder + "/");
-		generateCanvas(props, topicFolderPath);
-		generateReactionPaper(props, topicFolderPath);
+				return {
+					paper_title: path.slice(0, -4),
+					paper_year: year,
+					tag_class: this.tagClass,
+				};
+			}
+		);
 
-		// TODO: Create annotations
+		const pathObject = {
+			[this.topicTitle]: {
+				...canvasData(topicProps),
+				...reactionPaperData(topicProps),
+				...annotationsData(annotationProps),
+			},
+		};
+		createFilesAndFolders(
+			this.app.vault.adapter,
+			pathObject,
+			this.classFolder
+		);
 	}
 
 	onClose() {
@@ -195,8 +247,6 @@ class AnnotationModal extends Modal {
 			paper_title: this.paperTitle,
 			paper_year: this.paperYear,
 		};
-
-		generateAnnotations(props);
 	}
 
 	onClose() {
