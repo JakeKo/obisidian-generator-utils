@@ -1,34 +1,32 @@
-const PAPER_TITLE = `{{topic_title}}_Paper.md`;
+const PAPER_TITLE = `{{titleTopic}}_Paper.md`;
 const PAPER_CONTENT = `---
 tags:
-- topic/{{topic_title}}
-- class/{{tag_class}}
+- topic/{{tagTopic}}
+- class/{{tagClass}}
 - type/reaction_paper
 ---
-
-![[{{topic_title}}.canvas]]
-
+![[{{titleTopic}}.canvas]]
 \`\`\`dataview
-table authors, year from #topic/{{topic_title}} sort year asc
+table authors, year from #topic/{{tagTopic}} sort year asc
 \`\`\`
----`;
+`;
 
-const CANVAS_TITLE = `{{topic_title}}.canvas`;
+const CANVAS_TITLE = `{{titleTopic}}.canvas`;
 const CANVAS_CONTENT = `{
 	"nodes":[],
 	"edges":[]
 }`;
 
-const ANNOTATION_TITLE = `{{paper_title}}_{{paper_year}}_Annotated.md`;
+const ANNOTATION_TITLE = `{{titleArticle}}_Annotated.md`;
 const ANNOTATION_CONTENT = `---
-annotation-target: {{paper_title}}_{{paper_year}}.pdf
+annotation-target: {{fileArticle}}
 authors:
   - Koperski, Jake
-year: {{paper_year}}
+year: {{tagYear}}
 tags:
+  - topic/{{tagTopic}}
+  - class/{{tagClass}}
   - type/annotation
-  - class/{{tag_class}}
-  - topic/{{topic_title}}
 ---`;
 
 export {

@@ -9,14 +9,17 @@ import {
 } from "src/templates";
 
 type TopicProps = {
-	topic_title: string;
-	tag_class: string;
+	titleTopic: string;
+	tagTopic: string;
+	tagClass: string;
 };
 
 type AnnotationProps = {
-	paper_title: string;
-	paper_year: number;
-	tag_class: string;
+	titleArticle: string;
+	fileArticle: string;
+	tagYear: number;
+	tagTopic: string;
+	tagClass: string;
 };
 
 function createFilesAndFolders(
@@ -79,18 +82,22 @@ function reactionPaperData(props: TopicProps) {
 class TopicModal extends Modal {
 	topic: string;
 	classFolder: string;
-	annotationsPaths: string[] = [];
+	articles: string[] = [];
 
 	constructor(app: App) {
 		super(app);
 	}
 
-	get topicTitle(): string {
+	get titleTopic(): string {
 		return this.topic.replace(/\s/g, "_");
 	}
 
+	get tagTopic(): string {
+		return this.topic.toLocaleLowerCase().replace(/\s/g, "_");
+	}
+
 	get tagClass(): string {
-		return this.classFolder.replace(/\s/g, "_");
+		return this.classFolder.toLocaleLowerCase().replace(/\s/g, "_");
 	}
 
 	async getClassFolders(): Promise<Record<string, string>> {
@@ -140,7 +147,7 @@ class TopicModal extends Modal {
 			dropdown.addOptions(articles);
 
 			dropdown.onChange((value) => {
-				this.annotationsPaths = [value];
+				this.articles = [value];
 			});
 		});
 
@@ -157,23 +164,24 @@ class TopicModal extends Modal {
 
 	onSubmit() {
 		const topicProps: TopicProps = {
-			topic_title: this.topicTitle,
-			tag_class: this.tagClass,
+			titleTopic: this.titleTopic,
+			tagTopic: this.tagTopic,
+			tagClass: this.tagClass,
 		};
-		const annotationProps: AnnotationProps[] = this.annotationsPaths.map(
-			(path) => {
-				const year = Number.parseInt(path.match(/[0-9]+/)![0]);
+		const annotationProps: AnnotationProps[] = this.articles.map((path) => {
+			const year = Number.parseInt(path.match(/[0-9]+/)![0]);
 
-				return {
-					paper_title: path.slice(0, -4),
-					paper_year: year,
-					tag_class: this.tagClass,
-				};
-			}
-		);
+			return {
+				titleArticle: path.slice(0, -4),
+				fileArticle: path,
+				tagYear: year,
+				tagTopic: this.tagTopic,
+				tagClass: this.tagClass,
+			};
+		});
 
 		const pathObject = {
-			[this.topicTitle]: {
+			[this.titleTopic]: {
 				...canvasData(topicProps),
 				...reactionPaperData(topicProps),
 				...annotationsData(annotationProps),
