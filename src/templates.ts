@@ -12,10 +12,6 @@ table authors, year from #topic/{{tagTopic}} sort year asc
 `;
 
 const CANVAS_TITLE = `{{titleTopic}}.canvas`;
-const CANVAS_CONTENT = `{
-	"nodes":[],
-	"edges":[]
-}`;
 
 const ANNOTATION_TITLE = `{{titleArticle}}_Annotated.md`;
 const ANNOTATION_CONTENT = `---
@@ -33,7 +29,6 @@ export {
 	PAPER_TITLE,
 	PAPER_CONTENT,
 	CANVAS_TITLE,
-	CANVAS_CONTENT,
 	ANNOTATION_TITLE,
 	ANNOTATION_CONTENT,
 };

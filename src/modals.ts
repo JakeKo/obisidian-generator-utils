@@ -3,7 +3,6 @@ import {
 	ANNOTATION_CONTENT,
 	ANNOTATION_TITLE,
 	CANVAS_TITLE,
-	CANVAS_CONTENT,
 	PAPER_TITLE,
 	PAPER_CONTENT,
 } from "src/templates";
@@ -12,6 +11,7 @@ type TopicProps = {
 	titleTopic: string;
 	tagTopic: string;
 	tagClass: string;
+	pathArticles: string[];
 };
 
 type AnnotationProps = {
@@ -21,6 +21,12 @@ type AnnotationProps = {
 	tagTopic: string;
 	tagClass: string;
 };
+
+function genId(size: number): string {
+	return [...Array(size)]
+		.map(() => Math.floor(Math.random() * 16).toString(16))
+		.join("");
+}
 
 function createFilesAndFolders(
 	adapter: DataAdapter,
@@ -68,8 +74,19 @@ function annotationsData(props: AnnotationProps[]) {
 }
 
 function canvasData(props: TopicProps) {
+	const nodes = props.pathArticles.map((a, i) => ({
+		type: "file",
+		file: a,
+		width: 400,
+		height: 400,
+		x: 450 * i,
+		y: 0,
+		id: genId(16),
+	}));
+
 	const canvasTitle = hydrateTemplateString(CANVAS_TITLE, props);
-	const canvasContent = hydrateTemplateString(CANVAS_CONTENT, props);
+	const canvasContent = JSON.stringify({ nodes, edges: [] });
+
 	return { [canvasTitle]: canvasContent };
 }
 
@@ -146,8 +163,10 @@ class TopicModal extends Modal {
 			dropdown.selectEl.multiple = true;
 			dropdown.addOptions(articles);
 
-			dropdown.onChange((value) => {
-				this.articles = [value];
+			dropdown.onChange(() => {
+				this.articles = Array.from(dropdown.selectEl.options)
+					.filter((o) => o.selected)
+					.map((o) => o.value);
 			});
 		});
 
@@ -167,6 +186,10 @@ class TopicModal extends Modal {
 			titleTopic: this.titleTopic,
 			tagTopic: this.tagTopic,
 			tagClass: this.tagClass,
+			pathArticles: this.articles.map((path) => {
+				const title = path.slice(0, -4);
+				return `${this.classFolder}/${this.titleTopic}/${title}_Annotated.md`;
+			}),
 		};
 		const annotationProps: AnnotationProps[] = this.articles.map((path) => {
 			const year = Number.parseInt(path.match(/[0-9]+/)![0]);
