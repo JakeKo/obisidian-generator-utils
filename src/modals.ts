@@ -5,6 +5,7 @@ import {
 	canvasData,
 	annotationsData,
 	reactionPaperData,
+	notesData,
 } from "./utilities";
 
 class TopicModal extends Modal {
@@ -118,6 +119,7 @@ class TopicModal extends Modal {
 			[this.titleTopic]: {
 				...canvasData(topicProps),
 				...reactionPaperData(topicProps),
+				...notesData(topicProps),
 				...annotationsData(annotationProps),
 			},
 		};

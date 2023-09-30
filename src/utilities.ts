@@ -4,6 +4,8 @@ import {
 	ANNOTATION_CONTENT,
 	ANNOTATION_TITLE,
 	CANVAS_TITLE,
+	NOTES_CONTENT,
+	NOTES_TITLE,
 	PAPER_CONTENT,
 	PAPER_TITLE,
 } from "./templates";
@@ -82,9 +84,16 @@ function reactionPaperData(props: TopicProps) {
 	return { [paperTitle]: paperContent };
 }
 
+function notesData(props: TopicProps) {
+	const notesTitle = hydrateTemplateString(NOTES_TITLE, props);
+	const notesContent = hydrateTemplateString(NOTES_CONTENT, props);
+	return { [notesTitle]: notesContent };
+}
+
 export {
 	createFilesAndFolders,
 	annotationsData,
 	canvasData,
 	reactionPaperData,
+	notesData,
 };

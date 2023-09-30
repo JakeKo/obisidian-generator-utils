@@ -7,7 +7,20 @@ tags:
 ---
 ![[{{titleTopic}}.canvas]]
 \`\`\`dataview
-table authors, year from #topic/{{tagTopic}} sort year asc
+table title, year, summary from #topic/{{tagTopic}} and #type/annotation sort year asc
+\`\`\`
+`;
+
+const NOTES_TITLE = `{{titleTopic}}_Notes.md`;
+const NOTES_CONTENT = `---
+tags:
+- topic/{{tagTopic}}
+- class/{{tagClass}}
+- type/class_notes
+---
+![[{{titleTopic}}.canvas]]
+\`\`\`dataview
+table title, year, summary from #topic/{{tagTopic}} sort year asc
 \`\`\`
 `;
 
@@ -18,16 +31,20 @@ const ANNOTATION_CONTENT = `---
 annotation-target: {{fileArticle}}
 authors:
   - Koperski, Jake
+title:
 year: {{tagYear}}
 tags:
   - topic/{{tagTopic}}
   - class/{{tagClass}}
   - type/annotation
+summary:
 ---`;
 
 export {
 	PAPER_TITLE,
 	PAPER_CONTENT,
+	NOTES_TITLE,
+	NOTES_CONTENT,
 	CANVAS_TITLE,
 	ANNOTATION_TITLE,
 	ANNOTATION_CONTENT,
