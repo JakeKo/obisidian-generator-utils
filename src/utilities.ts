@@ -39,7 +39,8 @@ function hydrateTemplateString(template: string, props: Record<string, any>) {
 
 	entries.forEach((prop) => {
 		const [key, value] = prop;
-		hydratedTemplate = hydratedTemplate.replaceAll(`{{${key}}}`, value);
+		const keyRegExp = new RegExp(`{{${key}}}`, "g");
+		hydratedTemplate = hydratedTemplate.replace(keyRegExp, value);
 	});
 
 	return hydratedTemplate;
@@ -91,7 +92,9 @@ function notesData(props: TopicProps) {
 }
 
 export {
+	genId,
 	createFilesAndFolders,
+	hydrateTemplateString,
 	annotationsData,
 	canvasData,
 	reactionPaperData,

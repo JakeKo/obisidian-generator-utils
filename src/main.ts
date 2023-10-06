@@ -3,14 +3,6 @@ import { Plugin } from "obsidian";
 
 export default class GeneratorUtils extends Plugin {
 	async onload() {
-		// this.addCommand({
-		// 	id: "annotation",
-		// 	name: "Annotation",
-		// 	callback: () => {
-		// 		new AnnotationModal(this.app).open();
-		// 	},
-		// });
-
 		this.addCommand({
 			id: "topic",
 			name: "Topic",
