@@ -6,3 +6,15 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+
+#article-select {
+	height: 100px;
+}
+
+#article-select option {
+	background: transparent;
+}
+
+#article-select::-ms-expand {
+	display: none;
+}

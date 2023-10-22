@@ -54,6 +54,8 @@ class TopicModal extends Modal {
 	async onOpen() {
 		const { contentEl } = this;
 
+		contentEl.createEl("h1", { text: "Generate Annotations" });
+
 		new Setting(contentEl).setName("Topic").addText((text) =>
 			text.onChange((value) => {
 				this.topic = value;
@@ -73,6 +75,7 @@ class TopicModal extends Modal {
 		const articles = await this.getAnnotationArticles();
 		new Setting(contentEl).setName("Articles").addDropdown((dropdown) => {
 			dropdown.selectEl.multiple = true;
+			dropdown.selectEl.id = "article-select";
 			dropdown.addOptions(articles);
 
 			dropdown.onChange(() => {
