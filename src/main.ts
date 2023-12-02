@@ -1,4 +1,4 @@
-import { TopicModal } from "src/modals";
+import { PaperModal, TopicModal } from "src/modals";
 import { Plugin } from "obsidian";
 
 export default class GeneratorUtils extends Plugin {
@@ -8,6 +8,14 @@ export default class GeneratorUtils extends Plugin {
 			name: "Topic",
 			callback: () => {
 				new TopicModal(this.app).open();
+			},
+		});
+
+		this.addCommand({
+			id: "paper",
+			name: "Add Paper",
+			callback: () => {
+				new PaperModal(this.app).open();
 			},
 		});
 	}
