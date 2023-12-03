@@ -1,4 +1,4 @@
-import { App, DropdownComponent, Modal, Setting } from "obsidian";
+import { App, DataAdapter, DropdownComponent, Modal, Setting } from "obsidian";
 import { AnnotationProps, TopicProps } from "./types";
 import {
 	createFilesAndFolders,
@@ -7,6 +7,51 @@ import {
 	reactionPaperData,
 	notesData,
 } from "./utilities";
+
+async function getSubFolders(
+	path: string,
+	adapter: DataAdapter,
+	ignore: string[] = []
+) {
+	const { folders } = await adapter.list(path);
+	const foldersObject = Object.fromEntries(folders.map((f) => [f, f]));
+
+	ignore.forEach((item) => {
+		delete foldersObject[item];
+	});
+
+	return foldersObject;
+}
+
+async function getFolderItems(
+	path: string,
+	adapter: DataAdapter,
+	ignore: string[] = []
+) {
+	const { files } = await adapter.list(path);
+	const filesObject = Object.fromEntries(
+		files.map((f) => f.split("/").at(-1)).map((f) => [f, f])
+	);
+
+	ignore.forEach((item) => {
+		delete filesObject[item];
+	});
+
+	return filesObject;
+}
+
+const IGNORE = [".obsidian", "pdf"];
+async function getClassFolders(adapter: DataAdapter) {
+	return getSubFolders("/", adapter, IGNORE);
+}
+
+async function getTopicFolders(path: string, adapter: DataAdapter) {
+	return getSubFolders(path, adapter);
+}
+
+async function getArticles(adapter: DataAdapter) {
+	return getFolderItems("/pdf", adapter);
+}
 
 class TopicModal extends Modal {
 	topic: string;
@@ -29,28 +74,6 @@ class TopicModal extends Modal {
 		return this.classFolder.toLocaleLowerCase().replace(/\s/g, "_");
 	}
 
-	async getClassFolders(): Promise<Record<string, string>> {
-		const { folders } = await this.app.vault.adapter.list("/");
-		const classFolderObject = Object.fromEntries(
-			folders.map((f) => [f, f])
-		);
-
-		// Remove unnecessary folders from the options
-		delete classFolderObject[".obsidian"];
-		delete classFolderObject["pdf"];
-
-		return classFolderObject;
-	}
-
-	async getAnnotationArticles(): Promise<Record<string, string>> {
-		const { files } = await this.app.vault.adapter.list("/pdf");
-		const articlesObject = Object.fromEntries(
-			files.map((f) => f.replace("pdf/", "")).map((f) => [f, f])
-		);
-
-		return articlesObject;
-	}
-
 	async onOpen() {
 		const { contentEl } = this;
 
@@ -62,7 +85,7 @@ class TopicModal extends Modal {
 			})
 		);
 
-		const classFolders = await this.getClassFolders();
+		const classFolders = await getClassFolders(this.app.vault.adapter);
 		new Setting(contentEl).setName("Class").addDropdown((dropdown) => {
 			dropdown.addOption("", "Select");
 			dropdown.addOptions(classFolders);
@@ -72,7 +95,7 @@ class TopicModal extends Modal {
 			});
 		});
 
-		const articles = await this.getAnnotationArticles();
+		const articles = await getArticles(this.app.vault.adapter);
 		new Setting(contentEl).setName("Articles").addDropdown((dropdown) => {
 			dropdown.selectEl.multiple = true;
 			dropdown.selectEl.classList.add("article-select");
@@ -156,69 +179,49 @@ class PaperModal extends Modal {
 		return this.classFolder.toLocaleLowerCase().replace(/\s/g, "_");
 	}
 
-	async getClassFolders(): Promise<Record<string, string>> {
-		const { folders } = await this.app.vault.adapter.list("/");
-		const classFolderObject = Object.fromEntries(
-			folders.map((f) => [f, f])
-		);
-
-		// Remove unnecessary folders from the options
-		delete classFolderObject[".obsidian"];
-		delete classFolderObject["pdf"];
-
-		return classFolderObject;
-	}
-
-	async getTopicFolders(
-		classFolder: string
-	): Promise<Record<string, string>> {
-		const { folders } = await this.app.vault.adapter.list(classFolder);
-		const classFolderObject = Object.fromEntries(
-			folders.map((f) => [f, f])
-		);
-
-		return classFolderObject;
-	}
-
-	async getAnnotationArticles(): Promise<Record<string, string>> {
-		const { files } = await this.app.vault.adapter.list("/pdf");
-		const articlesObject = Object.fromEntries(
-			files.map((f) => f.replace("pdf/", "")).map((f) => [f, f])
-		);
-
-		return articlesObject;
-	}
-
 	async onOpen() {
 		const { contentEl } = this;
+
+		const self = this;
 		let topicDropdown: DropdownComponent | undefined;
+		async function resetTopicDropdown(newClassFolder: string) {
+			if (!topicDropdown) {
+				return;
+			}
+
+			const topicFolders = await getTopicFolders(
+				newClassFolder,
+				self.app.vault.adapter
+			);
+			topicDropdown.selectEl.empty();
+			topicDropdown.setValue("");
+			topicDropdown.addOption("", "Select");
+			topicDropdown.addOptions(topicFolders);
+		}
 
 		contentEl.createEl("h1", { text: "Add Paper" });
 
-		const classFolders = await this.getClassFolders();
+		const classFolders = await getClassFolders(this.app.vault.adapter);
 		new Setting(contentEl).setName("Class").addDropdown((dropdown) => {
 			dropdown.addOption("", "Select");
 			dropdown.addOptions(classFolders);
 
-			dropdown.onChange(async (value) => {
+			dropdown.onChange((value) => {
 				this.classFolder = value;
-				if (topicDropdown) {
-					const topicFolders = await this.getTopicFolders(value);
-					topicDropdown.selectEl.empty();
-					topicDropdown.addOptions(topicFolders);
-				}
+				resetTopicDropdown(value);
 			});
 		});
 
 		new Setting(contentEl).setName("Topics").addDropdown((dropdown) => {
 			topicDropdown = dropdown;
+			dropdown.addOption("", "Select");
 
 			dropdown.onChange((value) => {
 				this.topicFolder = value.split("/").at(-1) ?? "";
 			});
 		});
 
-		const articles = await this.getAnnotationArticles();
+		const articles = await getArticles(this.app.vault.adapter);
 		new Setting(contentEl).setName("Articles").addDropdown((dropdown) => {
 			dropdown.selectEl.multiple = true;
 			dropdown.selectEl.classList.add("article-select");
