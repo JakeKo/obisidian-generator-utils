@@ -8,6 +8,15 @@ import {
 	notesData,
 } from "./utilities";
 
+function objectMap<V1, V2>(
+	object: Record<string, V1>,
+	transform: (entry: [string, V1]) => [string, V2]
+): Record<string, V2> {
+	return Object.fromEntries(
+		Object.entries<V1>(object).map((entry) => transform(entry))
+	);
+}
+
 async function getSubFolders(
 	path: string,
 	adapter: DataAdapter,
@@ -196,7 +205,12 @@ class PaperModal extends Modal {
 			topicDropdown.selectEl.empty();
 			topicDropdown.setValue("");
 			topicDropdown.addOption("", "Select");
-			topicDropdown.addOptions(topicFolders);
+			topicDropdown.addOptions(
+				objectMap(topicFolders, ([, v]) => {
+					const newV = v.split("/").at(-1)!;
+					return [newV, newV];
+				})
+			);
 		}
 
 		contentEl.createEl("h1", { text: "Add Paper" });
@@ -217,7 +231,7 @@ class PaperModal extends Modal {
 			dropdown.addOption("", "Select");
 
 			dropdown.onChange((value) => {
-				this.topicFolder = value.split("/").at(-1) ?? "";
+				this.topicFolder = value;
 			});
 		});
 
