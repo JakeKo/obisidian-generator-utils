@@ -7,14 +7,14 @@ If your plugin does not need CSS, delete this file.
 
 */
 
-.article-select {
-	height: 100px;
+.multi-select select {
+	height: 150px;
 }
 
-.article-select option {
+.multi-select option {
 	background: transparent;
 }
 
-.article-select::-ms-expand {
+.multi-select::-ms-expand {
 	display: none;
 }

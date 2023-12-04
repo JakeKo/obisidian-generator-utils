@@ -105,17 +105,19 @@ class TopicModal extends Modal {
 		});
 
 		const articles = await getArticles(this.app.vault.adapter);
-		new Setting(contentEl).setName("Articles").addDropdown((dropdown) => {
-			dropdown.selectEl.multiple = true;
-			dropdown.selectEl.classList.add("article-select");
-			dropdown.addOptions(articles);
+		new Setting(contentEl)
+			.setName("Articles")
+			.setClass("multi-select")
+			.addDropdown((dropdown) => {
+				dropdown.selectEl.multiple = true;
+				dropdown.addOptions(articles);
 
-			dropdown.onChange(() => {
-				this.articles = Array.from(dropdown.selectEl.options)
-					.filter((o) => o.selected)
-					.map((o) => o.value);
+				dropdown.onChange(() => {
+					this.articles = Array.from(dropdown.selectEl.options)
+						.filter((o) => o.selected)
+						.map((o) => o.value);
+				});
 			});
-		});
 
 		new Setting(contentEl).addButton((btn) =>
 			btn
@@ -236,17 +238,19 @@ class PaperModal extends Modal {
 		});
 
 		const articles = await getArticles(this.app.vault.adapter);
-		new Setting(contentEl).setName("Articles").addDropdown((dropdown) => {
-			dropdown.selectEl.multiple = true;
-			dropdown.selectEl.classList.add("article-select");
-			dropdown.addOptions(articles);
+		new Setting(contentEl)
+			.setName("Articles")
+			.setClass("multi-select")
+			.addDropdown((dropdown) => {
+				dropdown.selectEl.multiple = true;
+				dropdown.addOptions(articles);
 
-			dropdown.onChange(() => {
-				this.articles = Array.from(dropdown.selectEl.options)
-					.filter((o) => o.selected)
-					.map((o) => o.value);
+				dropdown.onChange(() => {
+					this.articles = Array.from(dropdown.selectEl.options)
+						.filter((o) => o.selected)
+						.map((o) => o.value);
+				});
 			});
-		});
 
 		new Setting(contentEl).addButton((btn) =>
 			btn
