@@ -7,7 +7,7 @@ tags:
 ---
 ![[{{titleTopic}}.canvas]]
 \`\`\`dataview
-table title, year, summary from #topic/{{tagTopic}} and #type/annotation sort year asc
+table title, year, summary from #topic/{{tagTopic}} and #class/{{tagClass}} and #type/annotation sort year asc
 \`\`\`
 `;
 
@@ -20,7 +20,7 @@ tags:
 ---
 ![[{{titleTopic}}.canvas]]
 \`\`\`dataview
-table title, year, summary from #topic/{{tagTopic}} sort year asc
+table title, year, summary from #topic/{{tagTopic}} and #class/{{tagClass}} and #type/annotation sort year asc
 \`\`\`
 `;
 
