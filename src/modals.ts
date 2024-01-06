@@ -72,15 +72,21 @@ class TopicModal extends Modal {
 	}
 
 	get titleTopic(): string {
-		return this.topic.replace(/\s/g, "_");
+		return this.topic.replace(/\s/g, "_").replace(/,|\//g, "");
 	}
 
 	get tagTopic(): string {
-		return this.topic.toLocaleLowerCase().replace(/\s/g, "_");
+		return this.topic
+			.toLocaleLowerCase()
+			.replace(/\s/g, "_")
+			.replace(/,|\//g, "");
 	}
 
 	get tagClass(): string {
-		return this.classFolder.toLocaleLowerCase().replace(/\s/g, "_");
+		return this.classFolder
+			.toLocaleLowerCase()
+			.replace(/\s/g, "_")
+			.replace(/,|\//g, "");
 	}
 
 	async onOpen() {
@@ -90,8 +96,7 @@ class TopicModal extends Modal {
 
 		new Setting(contentEl).setName("Topic").addText((text) =>
 			text.onChange((value) => {
-				const cleanedText = value.replace(/,|\//g, "");
-				this.topic = cleanedText;
+				this.topic = value;
 			})
 		);
 
@@ -184,11 +189,17 @@ class PaperModal extends Modal {
 	}
 
 	get tagTopic(): string {
-		return this.topicFolder.toLocaleLowerCase().replace(/\s/g, "_");
+		return this.topicFolder
+			.toLocaleLowerCase()
+			.replace(/\s/g, "_")
+			.replace(/,|\//g, "");
 	}
 
 	get tagClass(): string {
-		return this.classFolder.toLocaleLowerCase().replace(/\s/g, "_");
+		return this.classFolder
+			.toLocaleLowerCase()
+			.replace(/\s/g, "_")
+			.replace(/,|\//g, "");
 	}
 
 	async onOpen() {
