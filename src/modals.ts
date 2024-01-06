@@ -90,7 +90,8 @@ class TopicModal extends Modal {
 
 		new Setting(contentEl).setName("Topic").addText((text) =>
 			text.onChange((value) => {
-				this.topic = value;
+				const cleanedText = value.replace(/,|\//g, "");
+				this.topic = cleanedText;
 			})
 		);
 
