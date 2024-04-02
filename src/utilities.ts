@@ -6,8 +6,6 @@ import {
 	CANVAS_TITLE,
 	NOTES_CONTENT,
 	NOTES_TITLE,
-	PAPER_CONTENT,
-	PAPER_TITLE,
 } from "./templates";
 
 function genId(size: number): string {
@@ -79,12 +77,6 @@ function canvasData(props: TopicProps) {
 	return { [canvasTitle]: canvasContent };
 }
 
-function reactionPaperData(props: TopicProps) {
-	const paperTitle = hydrateTemplateString(PAPER_TITLE, props);
-	const paperContent = hydrateTemplateString(PAPER_CONTENT, props);
-	return { [paperTitle]: paperContent };
-}
-
 function notesData(props: TopicProps) {
 	const notesTitle = hydrateTemplateString(NOTES_TITLE, props);
 	const notesContent = hydrateTemplateString(NOTES_CONTENT, props);
@@ -97,6 +89,5 @@ export {
 	hydrateTemplateString,
 	annotationsData,
 	canvasData,
-	reactionPaperData,
 	notesData,
 };

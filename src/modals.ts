@@ -4,7 +4,6 @@ import {
 	createFilesAndFolders,
 	canvasData,
 	annotationsData,
-	reactionPaperData,
 	notesData,
 } from "./utilities";
 
@@ -143,7 +142,7 @@ class TopicModal extends Modal {
 			tagClass: this.tagClass,
 			pathArticles: this.articles.map((path) => {
 				const title = path.slice(0, -4);
-				return `${this.classFolder}/${this.titleTopic}/${title}_Annotated.md`;
+				return `${this.classFolder}/${this.titleTopic}/${title}.md`;
 			}),
 		};
 		const annotationProps: AnnotationProps[] = this.articles.map((path) => {
@@ -161,7 +160,6 @@ class TopicModal extends Modal {
 		const pathObject = {
 			[this.titleTopic]: {
 				...canvasData(topicProps),
-				...reactionPaperData(topicProps),
 				...notesData(topicProps),
 				...annotationsData(annotationProps),
 			},
